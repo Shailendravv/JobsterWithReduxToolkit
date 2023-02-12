@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Landing, Error, Dashboard, Regtister } from "./pages";
+import { Landing, Error, Dashboard, Register } from "./pages";
 
 const App = () => {
   return (
@@ -7,7 +7,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="landing" element={<Landing />} />
-        <Route path="register" element={<Regtister />} />
+        <Route path="register" element={<Register />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
