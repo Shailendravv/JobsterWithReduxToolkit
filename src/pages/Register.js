@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Logo } from "../components";
 import Wrapper from "../assets/wrappers/RegisterPage";
 import FormRow from "../components/FormRow";
+import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, registerUser } from "../features/user/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const initialState = {
   name: "",
@@ -12,6 +16,9 @@ const initialState = {
 
 const Register = () => {
   const [values, setValues] = useState(initialState);
+  const { user, isLoading } = useSelector((store) => store.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // redux toolkit and useNavigate later
 
@@ -22,7 +29,7 @@ const Register = () => {
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    console.log(`${name}:${value}`);
+    // console.log(`${name}:${value}`);
     setValues({ ...values, [name]: value });
   };
 
@@ -30,10 +37,22 @@ const Register = () => {
     e.preventDefault();
     const { name, email, password, isMember } = values;
     if (!email || !password || (!isMember && !name)) {
-      consol.log("Please Fill Out All Fields");
+      toast.error("Please Fill Out All Fields");
       return;
     }
+    if (isMember) {
+      dispatch(loginUser({ email, password }));
+      return;
+    }
+    dispatch(registerUser({ name, email, password }));
   };
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    }
+  }, [user, navigate]);
   return (
     <Wrapper className="full-page">
       <form className="form" onSubmit={onSubmit}>
@@ -64,8 +83,8 @@ const Register = () => {
           handleChange={handleChange}
         />
 
-        <button type="submit" className="btn btn-block">
-          submit
+        <button type="submit" className="btn btn-block" disabled={isLoading}>
+          {isLoading ? "loading..." : "submit"}
         </button>
         <p>
           {values.isMember ? "Not a member yet?" : "Already a member?"}
