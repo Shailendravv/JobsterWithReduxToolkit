@@ -9,7 +9,8 @@ import {
 
 const initialState = {
   isLoading: false,
-  user: getUserFromLocalStorage,
+  isSidebarOpen: false,
+  user: getUserFromLocalStorage(),
 };
 
 export const registerUser = createAsyncThunk(
@@ -39,6 +40,16 @@ export const loginUser = createAsyncThunk(
 const userSlice = createSlice({
   name: "user",
   initialState,
+  reducers: {
+    logoutUser: (state) => {
+      state.user = null;
+      state.isSidebarOpen = false;
+      removeUserFromLocalStorage();
+    },
+    toggleSidebar: (state) => {
+      state.isSidebarOpen = !state.isSidebarOpen;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
@@ -49,7 +60,7 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.user = user;
         addUserToLocalStorage(user);
-        toast.success(`Hello There ${user.name}`);
+        toast.success(`Hello There ${user?.name}`);
       })
       .addCase(registerUser.rejected, (state, { payload }) => {
         state.isLoading = false;
@@ -63,7 +74,7 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.user = user;
         addUserToLocalStorage(user);
-        toast.success(`Welcome Back ${user.name}`);
+        toast.success(`Welcome Back ${user?.name}`);
       })
       .addCase(loginUser.rejected, (state, { payload }) => {
         state.isLoading = false;
@@ -72,4 +83,5 @@ const userSlice = createSlice({
   },
 });
 
+export const { toggleSidebar, logoutUser } = userSlice.actions;
 export default userSlice.reducer;
