@@ -8,9 +8,10 @@ import {
   handleChange,
   clearValues,
   createJob,
+  editJob,
 } from "../../features/job/jobSlice";
 
-const AddJobs = () => {
+const AddJob = () => {
   const {
     isLoading,
     position,
@@ -23,30 +24,42 @@ const AddJobs = () => {
     isEditing,
     editJobId,
   } = useSelector((store) => store.job);
-
+  const { user } = useSelector((store) => store.user);
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!position || !company || !jobLocation) {
-      toast.error("Please Fill Out All Fields");
+      toast.error("Please fill out all fields");
+      return;
+    }
+    if (isEditing) {
+      dispatch(
+        editJob({
+          jobId: editJobId,
+          job: { position, company, jobLocation, jobType, status },
+        })
+      );
       return;
     }
     dispatch(createJob({ position, company, jobLocation, jobType, status }));
   };
+
   const handleJobInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     dispatch(handleChange({ name, value }));
   };
-  const { user } = useSelector((store) => store.user);
 
   useEffect(() => {
-    // eventually will check for isEditing
-
     if (!isEditing) {
-      dispatch(handleChange({ name: "jobLocation", value: user.location }));
+      dispatch(
+        handleChange({
+          name: "jobLocation",
+          value: user.location,
+        })
+      );
     }
   }, []);
 
@@ -54,7 +67,6 @@ const AddJobs = () => {
     <Wrapper>
       <form className="form">
         <h3>{isEditing ? "edit job" : "add job"}</h3>
-
         <div className="form-center">
           {/* position */}
           <FormRow
@@ -70,24 +82,22 @@ const AddJobs = () => {
             value={company}
             handleChange={handleJobInput}
           />
-          {/* location */}
+          {/* jobLocation */}
           <FormRow
             type="text"
-            labelText="job location"
             name="jobLocation"
+            labelText="job location"
             value={jobLocation}
             handleChange={handleJobInput}
           />
-          {/* job status */}
+          {/* status */}
           <FormRowSelect
             name="status"
             value={status}
             handleChange={handleJobInput}
             list={statusOptions}
           />
-
-          {/* job type */}
-
+          {/* job type*/}
           <FormRowSelect
             name="jobType"
             labelText="job type"
@@ -95,8 +105,6 @@ const AddJobs = () => {
             handleChange={handleJobInput}
             list={jobTypeOptions}
           />
-
-          {/* btn container */}
           <div className="btn-container">
             <button
               type="button"
@@ -119,4 +127,4 @@ const AddJobs = () => {
     </Wrapper>
   );
 };
-export default AddJobs;
+export default AddJob;
